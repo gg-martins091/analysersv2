@@ -431,14 +431,14 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if (breakChance != 0 && uniform_random(1, 100) <= breakChance) {
 		Weapon::decrementItemCount(item);
-		g_game.updateSupplyTracker(player, item);
+		player->updateSupplyTracker(item);
 		return;
 	}
 
 	switch (action) {
 		case WEAPONACTION_REMOVECOUNT:
 			Weapon::decrementItemCount(item);
-			g_game.updateSupplyTracker(player, item);
+			player->updateSupplyTracker(item);
 			break;
 
 		case WEAPONACTION_REMOVECHARGE: {

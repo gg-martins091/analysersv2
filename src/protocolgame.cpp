@@ -2345,6 +2345,9 @@ void ProtocolGame::sendKillTrackerUpdate(Container* corpse, const std::string& n
 	msg.addByte(isCorpseEmpty ? 0 : corpse->size());
 	if (!isCorpseEmpty) {
 		for (ContainerIterator it = corpse->iterator(); it.hasNext(); it.advance()) {
+			msg.addItem(*it);
+
+			/* OR:
 			Item* item = *it;
 			msg.add<uint16_t>(item->getClientID());
 			msg.addByte(0);
@@ -2354,9 +2357,61 @@ void ProtocolGame::sendKillTrackerUpdate(Container* corpse, const std::string& n
  			const ItemType& iType = Item::items[item->getID()];
 			if (iType.isAnimation) {
 				msg.addByte(0x00);
-			}
+			}*/
 		}
 	}
+	writeToOutputBuffer(msg);
+}
+void ProtocolGame::sendUpdateSupplyTracker(const Item* item)
+{
+	if (!player) {
+		return;
+	}
+
+	if (getVersion() < 1140 || player->operatingSystem != CLIENTOS_NEW_WINDOWS) {
+		return;
+	}
+
+
+	if (!item) {
+		return;
+	}
+
+	NetworkMessage msg;
+	msg.addByte(0xCE);
+	msg.add<uint16_t>(item->getClientID());
+	writeToOutputBuffer(msg);
+}
+
+void ProtocolGame::sendUpdateImpactTracker(int32_t quantity, bool isHeal)
+{
+	if (!player) {
+		return;
+	}
+
+	if (getVersion() < 1140 || player->operatingSystem != CLIENTOS_NEW_WINDOWS) {
+		return;
+	}
+
+	NetworkMessage msg;
+	msg.addByte(0xCC);
+	msg.addByte(isHeal ? 0x0 : 0x01);
+	msg.add<uint32_t>(quantity);
+	writeToOutputBuffer(msg);
+}
+
+void ProtocolGame::sendUpdateLootTracker(Item* item)
+{
+	if (!player) {
+		return;
+	}
+
+	NetworkMessage msg;
+
+	msg.addByte(0xCF);
+	msg.addItem(item);
+	msg.addString(item->getName());
+	item->setIsLootTrackeable(false);
 	writeToOutputBuffer(msg);
 }
 

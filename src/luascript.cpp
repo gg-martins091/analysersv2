@@ -2154,6 +2154,8 @@ void LuaScriptInterface::registerFunctions()
  	registerMethod("Player", "getRewardList", LuaScriptInterface::luaPlayerGetRewardList);
  	registerMethod("Player", "sendInventory", LuaScriptInterface::luaPlayerSendInventory);
 
+ 	registerMethod("Player", "updateSupplyTracker", LuaScriptInterface::luaPlayerUpdateSupplyTracker);
+
 	registerMethod("Player", "getDepotChest", LuaScriptInterface::luaPlayerGetDepotChest);
 	registerMethod("Player", "getInbox", LuaScriptInterface::luaPlayerGetInbox);
 
@@ -7821,6 +7823,27 @@ int LuaScriptInterface::luaMonsterTypeIsRewardBoss(lua_State* L)
 	} else {
 		lua_pushnil(L);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerUpdateSupplyTracker(lua_State* L)
+{
+	// player:updateSupplyTracker(item)
+	Player* player = getUserdata<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	Item* item = getUserdata<Item>(L, 2);
+	if (!item) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	player->updateSupplyTracker(item);
+	pushBoolean(L, true);
+
 	return 1;
 }
 

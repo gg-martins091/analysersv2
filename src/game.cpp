@@ -1204,26 +1204,27 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 
 	// looting analyser from this point forward
-	if (!fromCylinder->getContainer() || !actor->getPlayer() || !toCylinder->getContainer()) {
-		return ret;
+	if (fromCylinder && actor && toCylinder) {
+		if (!fromCylinder->getContainer() || !actor->getPlayer() || !toCylinder->getContainer()) {
+			return ret;
+		}
+
+	 	if (Player* player = actor->getPlayer()) {
+	 		if (player->getProtocolVersion() < 1140 || player->operatingSystem != CLIENTOS_NEW_WINDOWS) {
+				return ret;
+			}
+
+	 		const ItemType& it = Item::items[fromCylinder->getItem()->getID()];
+			if (it.id <= 0) {
+				return ret;
+			}
+
+		 	if (it.corpseType != RACE_NONE && toCylinder->getContainer()->getTopParent() == player && item->getIsLootTrackeable()) {
+				player->updateLootTracker(item);
+			}
+	 	}
 	}
-
- 	if (Player* player = actor->getPlayer()) {
- 		if (player->getProtocolVersion() < 1140 || player->operatingSystem != CLIENTOS_NEW_WINDOWS) {
-			return ret;
-		}
-
- 		const ItemType& it = Item::items[fromCylinder->getItem()->getID()];
-		if (it.id <= 0) {
-			return ret;
-		}
-
-	 	if (it.corpseType != RACE_NONE && toCylinder->getContainer()->getTopParent() == player && item->getIsLootTrackeable()) {
-			updateLootTracker(actor->getPlayer(), item);
-		}
- 	}
 	
-
 	return ret;
 }
 
@@ -3921,8 +3922,8 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 		realHealthChange = target->getHealth() - realHealthChange;
 
 		if (realHealthChange > 0 && !target->isInGhostMode()) {
-			if (target->getPlayer()) {
-				updateImpactTracker(target->getPlayer(), realHealthChange, true);
+			if (targetPlayer) {
+				targetPlayer->updateImpactTracker(realHealthChange, true);
 			}
 
 			std::string damageString = std::to_string(realHealthChange) + (realHealthChange != 1 ? " hitpoints." : " hitpoint.");
@@ -4142,7 +4143,7 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 		if (realDamage > 0) {
 			if (Monster* targetMonster = target->getMonster()) {
 				if (attacker->getPlayer()) {
-					updateImpactTracker(attacker->getPlayer(), realDamage, false);
+					attackerPlayer->updateImpactTracker(realDamage, false);
 				}
 
 				if (targetMonster->isRandomSteping()) {
@@ -5744,72 +5745,4 @@ void Game::removeUniqueItem(uint16_t uniqueId)
 	if (it != uniqueItems.end()) {
 		uniqueItems.erase(it);
 	}
-}
-
-bool Game::updateSupplyTracker(Player* player, Item* item) {
-	if (!player) {
-		return false;
-	}
-	
-	if (player->getProtocolVersion() < 1140 || player->getOperatingSystem < CLIENTOS_NEW_WINDOWS) {
-		return false;
-	}
-
- 	if (!item) {
-		return false;
-	}
- 	NetworkMessage msg;
-	msg.addByte(0xCE);
-	msg.add<uint16_t>(item->getClientID());
-	player->sendNetworkMessage(msg, true);
- 	return true;
-}
-
-bool Game::updateLootTracker(Player* player, Item* item) {
-	if (!player) {
-		return false;
-	}
-
-	if (!item) {
-		return false;
-	}
-
- 	NetworkMessage msg;
- 	msg.addByte(0xCF);
-	msg.add<uint16_t>(item->getClientID());
-	msg.addByte(0);
- 	
- 	if (item->isStackable()) {
-		msg.addByte(item->getItemCount());
-	}
- 	
- 	const ItemType& it = Item::items[item->getID()];
-	if (it.isAnimation) {
-		msg.addByte(0x00);
-	}
- 	
- 	msg.addString(item->getName());
-	player->sendNetworkMessage(msg, true);
-	
-	item->setIsLootTrackeable(false);
- 	
- 	return true;
-}
-
-bool Game::updateImpactTracker(Player* player, int32_t quantity, bool isHeal) {
-	if (!player) {
-		return false;
-	}
-
-	if (player->getProtocolVersion() < 1140 || player->operatingSystem != CLIENTOS_NEW_WINDOWS) {
-		return false;
-	}
-
-	NetworkMessage msg;
-	msg.addByte(0xCC);
-	msg.addByte(isHeal ? 0 : 1);
-	msg.add<uint32_t>(quantity);
-	player->sendNetworkMessage(msg, true);
-
-	return true;
 }

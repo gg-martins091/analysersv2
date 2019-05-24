@@ -502,9 +502,6 @@ class Game
 			commands.reload();
 		}
 
-		bool updateSupplyTracker(Player* player, Item* item);
-		bool updateLootTracker(Player* player, Item* item);
-		bool updateImpactTracker(Player* player, int32_t quantity, bool isHeal);
 
 		Groups groups;
 		Map map;

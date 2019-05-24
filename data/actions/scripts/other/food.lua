@@ -135,14 +135,7 @@ function onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		return true
 	end
 
- 	local itemType = ItemType(item:getId())
-	if itemType then
-		local msg = NetworkMessage()
-		msg:addByte(0xCE)
-		msg:addU16(itemType:getClientId())
-		msg:sendToPlayer(player)
-		msg:delete()
-	end
+ 	player:updateSupplyTracker(item)
 
 	return true
 end

@@ -1206,12 +1206,36 @@ class Player final : public Creature, public Cylinder
 			if (!client) {
 				return false;
 			}
- 			if (getProtocolVersion() < 1140 || operatingSystem != CLIENTOS_NEW_WINDOWS) {
+
+			if (getProtocolVersion() < 1140 || operatingSystem != CLIENTOS_NEW_WINDOWS) {
 				return false;
 			}
- 			client->sendKillTrackerUpdate(corpse, name, creatureOutfit);
+
+			client->sendKillTrackerUpdate(corpse, name, creatureOutfit);
 			return true;
 		}
+
+		void updateSupplyTracker(const Item* item)
+		{
+			if (client) {
+				client->sendUpdateSupplyTracker(item);
+			}
+		}
+
+		void updateImpactTracker(int32_t quantity, bool isHeal)
+		{
+			if (client) {
+				client->sendUpdateImpactTracker(quantity, isHeal);
+			}
+		}
+
+		void updateLootTracker(Item* item)
+		{
+			if (client) {
+				client->sendUpdateLootTracker(item);
+			}
+		}
+		
 	protected:
 		std::forward_list<Condition*> getMuteConditions() const;
 

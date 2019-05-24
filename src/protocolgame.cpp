@@ -2410,6 +2410,23 @@ void ProtocolGame::sendUpdateLootTracker(Item* item)
 
 	msg.addByte(0xCF);
 	msg.addItem(item);
+	/* OR:
+	msg.add<uint16_t>(item->getClientID());
+	msg.addByte(0);
+
+	uint8_t count = msg.getByte();
+	if (it.isSplash() || it.isFluidContainer()) {
+		msg.addByte(fluidMap[count & 7]);
+	}
+
+	if (item->isStackable()) {
+		msg.addByte(item->getItemCount());
+	}
+
+	const ItemType& it = Item::items[item->getID()];
+	if (it.isAnimation) {
+		msg.addByte(0x00);
+	}*/
 	msg.addString(item->getName());
 	item->setIsLootTrackeable(false);
 	writeToOutputBuffer(msg);

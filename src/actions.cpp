@@ -427,6 +427,17 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		}
 		return false;
 	}
+
+	Cylinder* topParent = item->getTopParent();
+	if (topParent == player) {
+		const ItemType& it = Item::items[item->getID()];
+		if (it.id != 0) {
+			if (it.isSupply()) {
+				g_game.updateSupplyTracker(player, item);
+			}
+		}
+	}
+	
 	return true;
 }
 

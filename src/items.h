@@ -54,6 +54,7 @@ enum ItemTypes_t {
 	ITEM_TYPE_BED,
 	ITEM_TYPE_KEY,
 	ITEM_TYPE_RUNE,
+	ITEM_TYPE_SUPPLY,
 	ITEM_TYPE_REWARDCHEST,
 	ITEM_TYPE_CARPET,
 	ITEM_TYPE_LAST
@@ -151,6 +152,9 @@ class ItemType
 		}
 		bool isRune() const {
 			return type == ITEM_TYPE_RUNE;
+		}
+		bool isSupply() const {
+			return type == ITEM_TYPE_SUPPLY;
 		}
 		bool hasSubType() const {
 			return (isFluidContainer() || isSplash() || stackable || charges != 0);

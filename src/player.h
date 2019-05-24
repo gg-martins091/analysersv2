@@ -1200,6 +1200,18 @@ class Player final : public Creature, public Cylinder
 		spectators = client->spectators;
 		return true;
 		}
+
+		bool updateKillTracker(Container* corpse, const std::string& name, const Outfit_t creatureOutfit) const
+		{
+			if (!client) {
+				return false;
+			}
+ 			if (getProtocolVersion() < 1140 || operatingSystem != CLIENTOS_NEW_WINDOWS) {
+				return false;
+			}
+ 			client->sendKillTrackerUpdate(corpse, name, creatureOutfit);
+			return true;
+		}
 	protected:
 		std::forward_list<Condition*> getMuteConditions() const;
 

@@ -1,4 +1,5 @@
 local events = {
+    'KillTracker',
     'ElementalSpheresOverlords',
     'BigfootBurdenVersperoth',
     'Razzagorn',
@@ -210,5 +211,7 @@ function onLogin(player)
         player:setStorageValue(Storage.combatProtectionStorage, os.time() + 10)
         onMovementRemoveProtection(playerId, player:getPosition(), 10)
     end
+
+    player:sendInventory()
     return true
 end

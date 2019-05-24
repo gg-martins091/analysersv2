@@ -62,6 +62,7 @@ class Party
 		void updateAllPartyIcons();
 		void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
 		void broadcastPartyLoot(const std::string& loot);
+		void broadcastKillTrackerUpdate(Container* corpse, const std::string& name, const Outfit_t creatureOutfit) const;
 		bool empty() const {
 			return memberList.empty() && inviteList.empty();
 		}

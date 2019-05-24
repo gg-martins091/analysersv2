@@ -1449,6 +1449,7 @@ void LuaScriptInterface::registerFunctions()
 	registerEnum(ITEM_TYPE_BED)
 	registerEnum(ITEM_TYPE_KEY)
 	registerEnum(ITEM_TYPE_RUNE)
+	registerEnum(ITEM_TYPE_SUPPLY)
 
 	registerEnum(ITEM_BAG)
 	registerEnum(ITEM_GOLD_COIN)
@@ -2151,6 +2152,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod("Player", "getReward", LuaScriptInterface::luaPlayerGetReward);
  	registerMethod("Player", "removeReward", LuaScriptInterface::luaPlayerRemoveReward);
  	registerMethod("Player", "getRewardList", LuaScriptInterface::luaPlayerGetRewardList);
+ 	registerMethod("Player", "sendInventory", LuaScriptInterface::luaPlayerSendInventory);
 
 	registerMethod("Player", "getDepotChest", LuaScriptInterface::luaPlayerGetDepotChest);
 	registerMethod("Player", "getInbox", LuaScriptInterface::luaPlayerGetInbox);
@@ -2304,6 +2306,8 @@ void LuaScriptInterface::registerFunctions()
  	registerMethod("Player", "stopLiveCast", LuaScriptInterface::luaPlayerStopLiveCast);
  	registerMethod("Player", "isLiveCaster", LuaScriptInterface::luaPlayerIsLiveCaster);
 	registerMethod("Player", "getSpectators", LuaScriptInterface::luaPlayerGetSpectators);
+
+	registerMethod("Player", "ownsItem", LuaScriptInterface::luaPlayerOwnsItem);
 	
 	// Monster
 	registerClass("Monster", "Creature", LuaScriptInterface::luaMonsterCreate);
@@ -7793,6 +7797,21 @@ int LuaScriptInterface::luaPlayerGetRewardList(lua_State* L)
 	return 1;
 }
 
+int LuaScriptInterface::luaPlayerSendInventory(lua_State* L)
+{
+	// player:sendInventory()
+	Player* player = getUserdata<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	player->sendInventoryClientIds();
+	pushBoolean(L, true);
+
+	return 1;
+}
+
 int LuaScriptInterface::luaMonsterTypeIsRewardBoss(lua_State* L)
 {
 	// monsterType:isRewardBoss()
@@ -12737,4 +12756,14 @@ void LuaEnvironment::executeTimerEvent(uint32_t eventIndex)
 	for (auto parameter : timerEventDesc.parameters) {
 		luaL_unref(luaState, LUA_REGISTRYINDEX, parameter);
 	}
+}
+
+int LuaScriptInterface::luaPlayerOwnsItem(lua_State* L)
+{
+	// player:ownsItem()
+	Player* player = getUserdata<Player>(L, 1);
+	Item* item = getUserdata<Item>(L, 2);
+	Cylinder* parent = item->getTopParent();
+	pushBoolean(L, player == parent);
+	return 1;
 }

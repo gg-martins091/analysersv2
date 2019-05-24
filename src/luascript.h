@@ -832,6 +832,7 @@ class LuaScriptInterface
 		static int luaPlayerGetReward(lua_State* L);
 		static int luaPlayerRemoveReward(lua_State* L);
 		static int luaPlayerGetRewardList(lua_State* L);
+		static int luaPlayerSendInventory(lua_State* L);
 
 		static int luaPlayerGetDepotChest(lua_State* L);
 		static int luaPlayerGetInbox(lua_State* L);
@@ -986,6 +987,8 @@ class LuaScriptInterface
  		static int32_t luaPlayerStopLiveCast(lua_State* L);
  		static int32_t luaPlayerIsLiveCaster(lua_State* L);
 		static int32_t luaPlayerGetSpectators(lua_State* L);
+
+		static int luaPlayerOwnsItem(lua_State* L);
 		
 		// Monster
 		static int luaMonsterCreate(lua_State* L);

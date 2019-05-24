@@ -2330,6 +2330,36 @@ void ProtocolGame::sendModalWindow(const ModalWindow& modalWindow)
 	writeToOutputBuffer(msg);
 }
 
+void ProtocolGame::sendKillTrackerUpdate(Container* corpse, const std::string& name, const Outfit_t creatureOutfit)
+{
+	bool isCorpseEmpty = corpse->empty();
+	NetworkMessage msg;
+	msg.addByte(0xD1);
+	msg.addString(name);
+	msg.add<uint16_t>(creatureOutfit.lookType ? creatureOutfit.lookType : 21);
+	msg.addByte(creatureOutfit.lookType ? creatureOutfit.lookHead : 0x00);
+	msg.addByte(creatureOutfit.lookType ? creatureOutfit.lookBody : 0x00);
+	msg.addByte(creatureOutfit.lookType ? creatureOutfit.lookLegs : 0x00);
+	msg.addByte(creatureOutfit.lookType ? creatureOutfit.lookFeet : 0x00);
+	msg.addByte(creatureOutfit.lookType ? creatureOutfit.lookAddons : 0x00);
+	msg.addByte(isCorpseEmpty ? 0 : corpse->size());
+	if (!isCorpseEmpty) {
+		for (ContainerIterator it = corpse->iterator(); it.hasNext(); it.advance()) {
+			Item* item = *it;
+			msg.add<uint16_t>(item->getClientID());
+			msg.addByte(0);
+ 			if (item->isStackable()) {
+				msg.addByte(item->getItemCount());
+			}
+ 			const ItemType& iType = Item::items[item->getID()];
+			if (iType.isAnimation) {
+				msg.addByte(0x00);
+			}
+		}
+	}
+	writeToOutputBuffer(msg);
+}
+
 //tile
 void ProtocolGame::MoveUpCreature(NetworkMessage& msg, const Creature* creature, const Position& newPos, const Position& oldPos)
 {

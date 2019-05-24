@@ -168,6 +168,7 @@ std::vector<Item*> MonsterType::createLootItem(const LootBlock& lootBlock, bool 
 			tmpItem->setText(lootBlock.text);
 		}
 
+		tmpItem->setIsLootTrackeable(true);
 		itemList.push_back(tmpItem);
 	}
 	return itemList;

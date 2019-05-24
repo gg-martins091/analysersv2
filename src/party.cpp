@@ -347,6 +347,14 @@ void Party::broadcastPartyLoot(const std::string& loot)
 	}
 }
 
+void Party::broadcastKillTrackerUpdate(Container* corpse, const std::string& name, const Outfit_t creatureOutfit) const
+{
+	leader->updateKillTracker(corpse, name, creatureOutfit);
+ 	for (Player* member : memberList) {
+		member->updateKillTracker(corpse, name, creatureOutfit);
+	}
+}
+
 void Party::updateSharedExperience()
 {
 	if (sharedExpActive) {

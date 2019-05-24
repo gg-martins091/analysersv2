@@ -352,6 +352,8 @@ class ProtocolGame final : public ProtocolGameBase
 
 		//messages
 		void sendModalWindow(const ModalWindow& modalWindow);
+		
+		void sendKillTrackerUpdate(Container* corpse, const std::string& name, const Outfit_t creatureOutfit);
 
 		void MoveUpCreature(NetworkMessage& msg, const Creature* creature, const Position& newPos, const Position& oldPos);
 		void MoveDownCreature(NetworkMessage& msg, const Creature* creature, const Position& newPos, const Position& oldPos);
